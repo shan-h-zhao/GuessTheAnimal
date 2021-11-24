@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -30,9 +31,11 @@ public class MainActivity extends AppCompatActivity {
     String currentAnimalUrl;
     String currentAnimalName;
 
-    ArrayList<String> incorrectAnimalNames;
+    String correctTag;
 
     ImageView imageView;
+
+    TextView textView;
 
     Button button0;
     Button button1;
@@ -41,9 +44,21 @@ public class MainActivity extends AppCompatActivity {
 
     List<Button> buttons;
 
+    // TODO: Correct tag should be generated before it's used in the checkResults
+    // TODO: Once clicked, disable click, move on to the next picture
+    // TODO: Hide the textView when buttons not clicked
+
+    public void checkResults (View view) {
+        if (view.getTag().equals(correctTag)) {
+            textView.setText("Correct!");
+        } else {
+            textView.setText("Wrong!");
+        }
+    }
+
 
     public void showName() {
-        String correctTag = Integer.toString(new Random().nextInt(4));
+        correctTag = Integer.toString(new Random().nextInt(4));
 
         ArrayList<Integer> answerIds = new ArrayList<Integer>();
         answerIds.add(currentId);
@@ -140,11 +155,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         imageView = findViewById(R.id.imageView);
         button0 = findViewById(R.id.button0);
         button1 = findViewById(R.id.button1);
         button2 = findViewById(R.id.button2);
         button3 = findViewById(R.id.button3);
+        textView = findViewById(R.id.textView);
+
+
 
 
         // Parse the target url to get a list of image urls
@@ -182,21 +201,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        // Load the imageView with the first image
-        currentAnimalUrl = animalUrls.get(0);
+        // Load a random image and display names
+        currentId = new Random().nextInt(40);
+        currentAnimalUrl = animalUrls.get(currentId);
         downloadImage();
 
-        // Show animal names on buttons
         buttons = new ArrayList<Button>();
         buttons.add(button0);
         buttons.add(button1);
         buttons.add(button2);
         buttons.add(button3);
 
-        currentAnimalName = animalNames.get(0);
-        currentId = 0;
+        currentAnimalName = animalNames.get(currentId);
 
         showName();
+
+
+
 
 
 
