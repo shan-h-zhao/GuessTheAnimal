@@ -19,12 +19,12 @@
         app:srcCompat="@android:drawable/screen_background_light_transparent" />
 
     <androidx.gridlayout.widget.GridLayout
-        android:layout_width="348dp"
-        android:layout_height="364dp"
+        android:layout_width="338dp"
+        android:layout_height="282dp"
         android:layout_marginStart="1dp"
         android:layout_marginTop="1dp"
         android:layout_marginEnd="1dp"
-        android:layout_marginBottom="1dp"
+        android:layout_marginBottom="20dp"
         app:columnCount="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
