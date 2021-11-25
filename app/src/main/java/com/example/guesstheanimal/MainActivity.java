@@ -37,66 +37,14 @@ public class MainActivity extends AppCompatActivity {
 
     TextView textView;
 
+    Button nextButton;
+
     Button button0;
     Button button1;
     Button button2;
     Button button3;
 
     List<Button> buttons;
-
-    // TODO: Correct tag should be generated before it's used in the checkResults
-    // TODO: Once clicked, disable click, move on to the next picture
-    // TODO: Hide the textView when buttons not clicked
-
-    public void checkResults (View view) {
-        if (view.getTag().equals(correctTag)) {
-            textView.setText("Correct!");
-        } else {
-            textView.setText("Wrong!");
-        }
-    }
-
-
-    public void showName() {
-        correctTag = Integer.toString(new Random().nextInt(4));
-
-        ArrayList<Integer> answerIds = new ArrayList<Integer>();
-        answerIds.add(currentId);
-
-        Log.i("current id", String.valueOf(currentId));
-        Log.i("current name", String.valueOf(currentAnimalName));
-        Log.i("correct tag", String.valueOf(correctTag));
-
-        for (Button b: buttons) {
-            Log.i("button tag", String.valueOf(b.getTag()));
-            if (b.getTag().equals(correctTag)) {
-                Log.i("current name", String.valueOf(currentAnimalName));
-                b.setText(currentAnimalName);
-            } else {
-                int randomId = new Random().nextInt(40);
-                while (answerIds.contains(randomId)) {
-                    randomId = new Random().nextInt(40);
-                }
-                b.setText(animalNames.get(randomId));
-                answerIds.add(randomId);
-                Log.i("random id", String.valueOf(randomId));
-                Log.i("random name", String.valueOf(animalNames.get(randomId)));
-            }
-        }
-    }
-
-    public void downloadImage () {
-        ImageDownloader task = new ImageDownloader();
-        Bitmap bitmap;
-
-        try {
-            bitmap = task.execute(currentAnimalUrl).get();
-            imageView.setImageBitmap(bitmap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 
     // Create a DownloadTask class for downloading image url and image names
     public class DownloadTask extends AsyncTask<String, Void, String> {
@@ -128,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     // Create an ImageDownloader class to download images, given urls
     public class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
 
@@ -149,12 +98,87 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    // Create a function to download image given an url and display it in imageView
+    public void downloadImage () {
+        ImageDownloader task = new ImageDownloader();
+        Bitmap bitmap;
+
+        try {
+            bitmap = task.execute(currentAnimalUrl).get();
+            imageView.setImageBitmap(bitmap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Create a function to show the correct and three random incorrect names on the buttons
+    public void showName() {
+        correctTag = Integer.toString(new Random().nextInt(4));
+
+        ArrayList<Integer> answerIds = new ArrayList<Integer>();
+        answerIds.add(currentId);
+
+        for (Button b: buttons) {
+            if (b.getTag().equals(correctTag)) {
+                b.setText(currentAnimalName);
+            } else {
+                int randomId = new Random().nextInt(40);
+                while (answerIds.contains(randomId)) {
+                    randomId = new Random().nextInt(40);
+                }
+                b.setText(animalNames.get(randomId));
+                answerIds.add(randomId);
+            }
+        }
+    }
+
+
+    // Create a function to load a random image and display names
+    public void showRandAnimal () {
+        currentId = new Random().nextInt(40);
+        currentAnimalUrl = animalUrls.get(currentId);
+        downloadImage();
+
+        buttons = new ArrayList<Button>();
+        buttons.add(button0);
+        buttons.add(button1);
+        buttons.add(button2);
+        buttons.add(button3);
+
+        currentAnimalName = animalNames.get(currentId);
+
+        showName();
+    }
+
+    // Create a button onClick function to check if the correct answer is picked
+    public void checkResults (View view) {
+        if (view.getTag().equals(correctTag)) {
+            textView.setText("Correct!");
+        } else {
+            textView.setText("Wrong!");
+        }
+        textView.setVisibility(View.VISIBLE);
+        nextButton.setVisibility(View.VISIBLE);
+        for (Button b: buttons) {
+            b.setEnabled(false);
+        }
+    }
+
+    // Create a button onClick function to move to the next image
+    public void showNext (View view) {
+        showRandAnimal();
+        textView.setVisibility(View.INVISIBLE);
+        nextButton.setVisibility(View.INVISIBLE);
+        for (Button b: buttons) {
+            b.setEnabled(true);
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         imageView = findViewById(R.id.imageView);
         button0 = findViewById(R.id.button0);
@@ -162,9 +186,11 @@ public class MainActivity extends AppCompatActivity {
         button2 = findViewById(R.id.button2);
         button3 = findViewById(R.id.button3);
         textView = findViewById(R.id.textView);
+        nextButton = findViewById(R.id.nextButton);
 
-
-
+        // Set textView and nextButton invisible
+        nextButton.setVisibility(View.INVISIBLE);
+        textView.setVisibility(View.INVISIBLE);
 
         // Parse the target url to get a list of image urls
         DownloadTask downloadTask = new DownloadTask();
@@ -201,31 +227,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        // Load a random image and display names
-        currentId = new Random().nextInt(40);
-        currentAnimalUrl = animalUrls.get(currentId);
-        downloadImage();
-
-        buttons = new ArrayList<Button>();
-        buttons.add(button0);
-        buttons.add(button1);
-        buttons.add(button2);
-        buttons.add(button3);
-
-        currentAnimalName = animalNames.get(currentId);
-
-        showName();
-
-
-
-
-
-
-
-
-
-
-
+        // Load a random animal to start
+        showRandAnimal();
 
     }
 }
